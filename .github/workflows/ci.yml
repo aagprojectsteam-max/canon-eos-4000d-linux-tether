@@ -1,0 +1,9 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Static validation
+        run: bash tests/static-test.sh
