@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -u
+RUNTIME="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+PIDFILE="$RUNTIME/aag-canon-4000d.pid"
+echo "========== AAG CANON STATUS =========="
+if [[ -s "$PIDFILE" ]] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then echo "manager=running pid=$(cat "$PIDFILE")"; else echo "manager=stopped"; fi
+SYSFS="$(for d in /sys/bus/usb/devices/*; do [[ -r "$d/idVendor" && -r "$d/idProduct" ]] || continue; [[ "$(cat "$d/idVendor")" == 04a9 && "$(cat "$d/idProduct")" == 32d9 ]] && { echo "$d"; break; }; done)"
+if [[ -n "$SYSFS" ]]; then
+  echo "camera=present sysfs=$(basename "$SYSFS") bus=$(cat "$SYSFS/busnum") dev=$(cat "$SYSFS/devnum")"
+  echo "power_control=$(cat "$SYSFS/power/control" 2>/dev/null || echo '?')"
+  echo "runtime_status=$(cat "$SYSFS/power/runtime_status" 2>/dev/null || echo '?')"
+else echo "camera=absent"; fi
+echo "gvfs_mounts:"
+gio mount -l 2>/dev/null | grep -A3 -B1 -iE 'Canon|gphoto2://' || true
