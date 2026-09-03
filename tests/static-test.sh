@@ -27,9 +27,15 @@ for f in "$ROOT/install.sh" "$ROOT/uninstall.sh" "$ROOT/bin/"* "$ROOT/dist/"*.ru
   bash -n "$f"
 done
 
-if grep -RniE 'aag-linux|023070006323|f17acb8b|/mnt/data/MyProjects|Adir Avraham|Gal-on' "$ROOT" --exclude-dir=.git; then
+# Scan public payload/docs for known private development identifiers. Exclude this
+# test file itself because the forbidden patterns necessarily appear in its rule.
+if grep -RniE 'aag-linux|023070006323|f17acb8b|/mnt/data/MyProjects|Adir Avraham|Gal-on' \
+  "$ROOT/app" "$ROOT/bin" "$ROOT/docs" "$ROOT/README.md" "$ROOT/CHANGELOG.md" \
+  "$ROOT/CONTRIBUTING.md" "$ROOT/SECURITY.md" "$ROOT/install.sh" "$ROOT/uninstall.sh" \
+  "$ROOT/dist"; then
   echo 'ERROR: private/development-only identifier found' >&2
   exit 1
 fi
 
+echo 'Privacy scan: PASS'
 echo 'Static tests: PASS'
