@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -u
+ROOT="${AAG_CANON_ROOT:-${XDG_DATA_HOME:-$HOME/.local/share}/aag-canon-4000d}"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+OUT="$HOME/Downloads/AAG-CANON-DIAGNOSE-$STAMP.log"
+{
+  echo "========== AAG CANON 4000D DIAGNOSE =========="
+  . /etc/os-release 2>/dev/null && echo "OS=$PRETTY_NAME"
+  uname -a
+  echo "session=${XDG_SESSION_TYPE:-unknown} desktop=${XDG_CURRENT_DESKTOP:-unknown}"
+  echo; "$HOME/.local/bin/aag-canon-status" 2>&1 || true
+  echo; lsusb 2>&1 | grep -iE '04a9|Canon' || true; lsusb -t 2>&1 || true
+  echo; pgrep -a -f 'gvfsd-gphoto2|gvfs-gphoto2-volume-monitor|gphoto2|aag_canon.py' || true
+  echo; gphoto2 --version 2>&1 || true
+  if ! pgrep -f 'aag_canon.py' >/dev/null; then gphoto2 --auto-detect 2>&1 || true; else echo "Skipped direct gphoto2 access because AAG Canon Manager owns the camera."; fi
+  echo; journalctl -k -b --no-pager 2>/dev/null | grep -iE 'usb|04a9|32d9|Canon|disconnect|reset|suspend|resume' | tail -300 || true
+  echo; find "$ROOT/logs" -maxdepth 1 -type f -name '*.log' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -5 | cut -d' ' -f2- | while IFS= read -r LOG; do echo "--- $LOG ---"; tail -200 "$LOG"; done
+} | tee "$OUT"
+echo "Saved: $OUT"
