@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+ROOT="${AAG_CANON_ROOT:-${XDG_DATA_HOME:-$HOME/.local/share}/aag-canon-4000d}"
+APP="$ROOT/app/aag_canon.py"
+[[ -f "$APP" ]] || { echo "ERROR: AAG Canon Manager is not installed at: $APP" >&2; exit 1; }
+exec env LC_ALL=C.UTF-8 LANG=C.UTF-8 PYTHONUNBUFFERED=1 AAG_CANON_ROOT="$ROOT" python3 "$APP" "$@"
