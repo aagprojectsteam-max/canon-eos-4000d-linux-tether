@@ -6,7 +6,6 @@ USER_HOME="$(getent passwd "$USER_NAME" | cut -d: -f6)"
 ROOT="${AAG_CANON_ROOT:-${XDG_DATA_HOME:-$USER_HOME/.local/share}/aag-canon-4000d}"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 PARTS=("$SOURCE_DIR"/app/canonical/aag_canon.py.gz.b64.part*)
-EXPECTED_B64_SHA256='d3239d838a5ee0cfb853e7823a7a23c32bca9fd97c140fda8b01471f74b7863a'
 EXPECTED_SOURCE_SHA256='5e3843a1f70e98eb70e11fe9ee521968625484188d56ca6617cb263bb128824b'
 
 echo "AAG Canon EOS 4000D Linux Manager v1.1.0"
@@ -28,9 +27,8 @@ cp -a "$SOURCE_DIR/app/." "$ROOT/app/"
 B64_TMP="$(mktemp)"; SRC_TMP="$(mktemp)"
 trap 'rm -f "$B64_TMP" "$SRC_TMP"' EXIT
 cat "${PARTS[@]}" > "$B64_TMP"
-[[ "$(sha256sum "$B64_TMP" | awk '{print $1}')" == "$EXPECTED_B64_SHA256" ]] || { echo 'ERROR: canonical payload checksum mismatch' >&2; exit 20; }
 base64 --decode "$B64_TMP" | gzip -dc > "$SRC_TMP"
-[[ "$(sha256sum "$SRC_TMP" | awk '{print $1}')" == "$EXPECTED_SOURCE_SHA256" ]] || { echo 'ERROR: production source checksum mismatch' >&2; exit 21; }
+[[ "$(sha256sum "$SRC_TMP" | awk '{print $1}')" == "$EXPECTED_SOURCE_SHA256" ]] || { echo 'ERROR: canonical production source checksum mismatch' >&2; exit 21; }
 python3 -m py_compile "$SRC_TMP"
 install -m 0755 "$SRC_TMP" "$ROOT/app/aag_canon.py"
 
