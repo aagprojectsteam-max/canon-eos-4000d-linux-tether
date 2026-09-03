@@ -1,0 +1,59 @@
+name: Publish release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release tag
+        required: true
+        default: v1.1.0
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate source
+        run: bash tests/static-test.sh
+
+      - name: Validate standalone installer
+        run: |
+          test -s dist/canon-eos-4000d-linux-installer.run
+          bash -n dist/canon-eos-4000d-linux-installer.run
+          sha256sum dist/canon-eos-4000d-linux-installer.run > canon-eos-4000d-linux-installer.run.sha256
+
+      - name: Create tag
+        env:
+          TAG: ${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git rev-parse "$TAG" >/dev/null 2>&1; then
+            git tag -a "$TAG" -m "Canon EOS 4000D Linux Tether $TAG"
+            git push origin "$TAG"
+          fi
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.version }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" \
+              dist/canon-eos-4000d-linux-installer.run \
+              canon-eos-4000d-linux-installer.run.sha256 \
+              --clobber
+          else
+            gh release create "$TAG" \
+              dist/canon-eos-4000d-linux-installer.run \
+              canon-eos-4000d-linux-installer.run.sha256 \
+              --title "Canon EOS 4000D Linux Tether $TAG" \
+              --generate-notes \
+              --latest
+          fi
