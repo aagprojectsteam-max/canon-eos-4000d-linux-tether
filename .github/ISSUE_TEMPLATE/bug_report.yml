@@ -1,0 +1,63 @@
+name: Bug report
+description: Report a problem with Canon EOS 4000D Linux Tether
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve the project. Please remove camera serial numbers, usernames, private paths and personal photos from diagnostics.
+  - type: input
+    id: distro
+    attributes:
+      label: Linux distribution and version
+      placeholder: Ubuntu 26.04 LTS
+    validations:
+      required: true
+  - type: input
+    id: camera
+    attributes:
+      label: Camera model
+      value: Canon EOS 4000D
+    validations:
+      required: true
+  - type: input
+    id: gphoto
+    attributes:
+      label: gphoto2 / libgphoto2 version
+      placeholder: Output of gphoto2 --version
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected feature
+      options:
+        - Camera detection / connection
+        - Live View
+        - Autofocus
+        - Capture
+        - Download
+        - Disconnect / reconnect
+        - Installation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Sanitized diagnostics
+      description: Paste relevant output from aag-canon-diagnose after removing private identifiers.
+      render: shell
