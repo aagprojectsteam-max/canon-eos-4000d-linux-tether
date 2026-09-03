@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+RUNTIME="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+PIDFILE="$RUNTIME/aag-canon-4000d.pid"
+if [[ ! -s "$PIDFILE" ]]; then echo "AAG Canon Manager is not running."; exit 0; fi
+PID="$(cat "$PIDFILE")"
+if kill -0 "$PID" 2>/dev/null; then
+  kill -TERM "$PID"
+  for _ in {1..30}; do kill -0 "$PID" 2>/dev/null || { echo "AAG Canon Manager stopped."; exit 0; }; sleep 0.1; done
+  echo "Process $PID did not exit within 3 seconds." >&2; exit 1
+fi
+rm -f -- "$PIDFILE"
+echo "Removed stale PID file."
