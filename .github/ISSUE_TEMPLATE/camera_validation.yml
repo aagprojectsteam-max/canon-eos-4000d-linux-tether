@@ -1,0 +1,43 @@
+name: Camera validation report
+description: Report results from another Canon camera model
+title: "[Camera validation]: "
+labels: [camera-validation]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The Canon EOS 4000D is the currently validated model. Use this form to contribute physical-test results for another model. Do not include camera serial numbers or personal images.
+  - type: input
+    id: model
+    attributes:
+      label: Exact camera model
+    validations:
+      required: true
+  - type: input
+    id: usbid
+    attributes:
+      label: USB VID:PID
+      placeholder: 04a9:xxxx
+    validations:
+      required: true
+  - type: input
+    id: distro
+    attributes:
+      label: Linux distribution and version
+    validations:
+      required: true
+  - type: checkboxes
+    id: results
+    attributes:
+      label: Physical test results
+      options:
+        - label: Camera detection works
+        - label: Live View works
+        - label: AF Once works
+        - label: Capture works
+        - label: Download works
+        - label: USB disconnect/reconnect recovery works
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes and sanitized diagnostics
