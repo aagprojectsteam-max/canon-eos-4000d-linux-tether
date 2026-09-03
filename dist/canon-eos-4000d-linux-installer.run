@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+REPO='https://github.com/aagprojectsteam-max/canon-eos-4000d-linux-tether.git'
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
+command -v git >/dev/null 2>&1 || { sudo apt-get update; sudo apt-get install -y git; }
+git clone --depth 1 "$REPO" "$TMP/repo"
+exec bash "$TMP/repo/install.sh"

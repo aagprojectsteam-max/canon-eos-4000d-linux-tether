@@ -8,11 +8,11 @@ A native Ubuntu/Linux tethering manager for the **Canon EOS 4000D** using **libg
 
 - Live View (validated at ~27.6 FPS on the development EOS 4000D)
 - AF Once autofocus
-- Remote capture
-- Automatic image download
+- Remote capture and automatic download
 - USB disconnect/reconnect recovery
 - Targeted GNOME/GVFS handling
 - Persistent libgphoto2 session
+- Atomic `.part` download/rename
 - No root GUI
 - No global USB/kernel hacks
 - Does not delete images from the camera
@@ -23,7 +23,7 @@ A native Ubuntu/Linux tethering manager for the **Canon EOS 4000D** using **libg
 
 Other Canon cameras may work through libgphoto2, but are **not claimed as supported** until physically validated.
 
-## Ubuntu quick install
+## Quick install
 
 ```bash
 git clone https://github.com/aagprojectsteam-max/canon-eos-4000d-linux-tether.git
@@ -44,25 +44,21 @@ aag-canon
 
 ## One-file installer
 
-A standalone installer is included at:
-
-```text
-dist/canon-eos-4000d-linux-installer.run
-```
-
-Run:
+Download `dist/canon-eos-4000d-linux-installer.run`, then:
 
 ```bash
 chmod +x canon-eos-4000d-linux-installer.run
 ./canon-eos-4000d-linux-installer.run
 ```
 
+The one-file installer clones the current public release and runs the verified installer.
+
 ## Important camera settings
 
 - **Auto Power Off = Disable** is required for stable tethering.
-- Lens **AF** is required only for the **AF Once** feature.
-- **M mode is optional**. Use it only when you want manual exposure control.
-- Automatic/Green exposure mode is valid for Live View and capture.
+- Lens **AF** is required only for **AF Once**.
+- **M mode is optional** and is only needed when you want manual exposure controls.
+- Automatic/Green exposure mode remains valid for Live View and capture.
 
 ## Commands
 
@@ -79,23 +75,15 @@ Downloaded images are stored under:
 ~/Pictures/Canon-4000D/YYYY-MM-DD/
 ```
 
-## Why this project exists
+## What was solved
 
-Several existing Linux tethering applications were tested on the EOS 4000D but did not provide a reliable complete workflow. The working path was built directly on libgphoto2 and validated end-to-end on physical hardware.
+The project documents the practical EOS 4000D issues found during physical testing: camera-side Auto Power Off causing full USB disappearance, GNOME/GVFS PTP contention, reliable Canon remote-release capture, Live View queue/pacing optimization, autofocus cleanup, and reconnect behavior.
 
-See [Architecture](docs/ARCHITECTURE.md), [Troubleshooting](docs/TROUBLESHOOTING.md), and [EOS 4000D findings](docs/EOS-4000D-FINDINGS.md).
+See [Architecture](docs/ARCHITECTURE.md), [Troubleshooting](docs/TROUBLESHOOTING.md), [EOS 4000D findings](docs/EOS-4000D-FINDINGS.md), and [Source integrity](docs/SOURCE-INTEGRITY.md).
 
 ## Safety / system impact
 
-The installer does **not**:
-
-- disable GVFS globally;
-- disable USB autosuspend globally;
-- change the kernel;
-- install a boot service;
-- require the GUI to run as root;
-- delete images from the camera;
-- run `apt autoremove`.
+The installer does **not** disable GVFS globally, disable USB autosuspend globally, change the kernel, install a boot service, run the GUI as root, delete camera images, or run `apt autoremove`.
 
 ## License
 
